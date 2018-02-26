@@ -11,3 +11,5 @@
 # rspec failure tracking
 .rspec_status
 increasecard-utils-0.1.0.gem
+/vendor
+.byebug_history

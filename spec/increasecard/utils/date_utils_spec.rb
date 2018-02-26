@@ -22,37 +22,49 @@ describe DateUtils do
   describe '#closest_date_from' do
     context 'when being on year A and mmdd would be on year A + 1' do
       let(:year_A) { 2016 }
+      let(:format) { %r{(?<month>\d{2})[/-]?(?<day>\d{2})} }
       before do
         Timecop.freeze(Date.parse("#{year_A}-12-20"))
       end
       let(:mmdd_year_ahead) { '01/05' }
       let(:mmdd_same_year)  { '12/30' }
 
-      it { expect(described_class.closest_date_from(mmdd_year_ahead).year).to eq(year_A + 1) }
-      it { expect(described_class.closest_date_from(mmdd_same_year).year).to eq(year_A) }
+      it do
+        expect(described_class.closest_date_from(mmdd_year_ahead, format).year).to eq(year_A + 1)
+      end
+      it do
+        expect(described_class.closest_date_from(mmdd_same_year, format).year).to eq(year_A)
+      end
     end
 
     context 'when being on year A and mmdd would be on year A - 1' do
       let(:year_A) { 2017 }
+      let(:format) { %r{(?<month>\d{2})[/-]?(?<day>\d{2})} }
       before do
         Timecop.freeze(Date.parse("#{year_A}-01-02"))
       end
       let(:mmdd_year_behind)  { '12/30' }
       let(:mmdd_same_year)    { '01/20' }
 
-      it { expect(described_class.closest_date_from(mmdd_year_behind).year).to eq(year_A - 1) }
-      it { expect(described_class.closest_date_from(mmdd_same_year).year).to eq(year_A) }
+      it do
+        expect(described_class.closest_date_from(mmdd_year_behind, format).year)
+          .to eq(year_A - 1)
+      end
+      it do
+        expect(described_class.closest_date_from(mmdd_same_year, format).year)
+          .to eq(year_A)
+      end
     end
   end
 
   describe '#closest_date_from_to' do
     context 'when both are in the same year' do
       it 'returns the same year for the resulting date' do
-        expect(described_class.closest_date_from_to('30/12', Date.new(2016, 12, 29), '%d%m').year)
+        expect(described_class.closest_date_from_to('30/12', Date.new(2016, 12, 29)).year)
           .to eq(2016)
-        expect(described_class.closest_date_from_to('30/12', Date.new(2016, 12, 29), '%d%m').year)
+        expect(described_class.closest_date_from_to('30/12', Date.new(2016, 12, 29)).year)
           .to eq(2016)
-        expect(described_class.closest_date_from_to('30/12', Date.new(2016, 12, 29), '%d%m').year)
+        expect(described_class.closest_date_from_to('30/12', Date.new(2016, 12, 29)).year)
           .to eq(2016)
       end
     end
@@ -60,17 +72,17 @@ describe DateUtils do
       let(:date_and_month) { '30/12' }
       let(:reference_date) { Date.new(2017, 1, 20) }
       it 'returns the previous year for the resulting date' do
-        expect(described_class.closest_date_from_to('10/12', Date.new(2017, 1, 30), '%d%m').year)
+        expect(described_class.closest_date_from_to('10/12', Date.new(2017, 1, 30)).year)
           .to eq(2016)
-        expect(described_class.closest_date_from_to('01/12', Date.new(2017, 1, 31), '%d%m').year)
+        expect(described_class.closest_date_from_to('01/12', Date.new(2017, 1, 31)).year)
           .to eq(2016)
       end
     end
     context 'when they are from different years and the reference date is lower' do
       it 'returns the next year for the resulting date' do
-        expect(described_class.closest_date_from_to('10/01', Date.new(2016, 12, 30), '%d%m').year)
+        expect(described_class.closest_date_from_to('10/01', Date.new(2016, 12, 30)).year)
           .to eq(2017)
-        expect(described_class.closest_date_from_to('01/01', Date.new(2016, 12, 31), '%d%m').year)
+        expect(described_class.closest_date_from_to('01/01', Date.new(2016, 12, 31)).year)
           .to eq(2017)
       end
     end
